@@ -26,6 +26,12 @@ namespace WebStore.UI.Controllers
         /*
          *  [ --Products-- ]
          */
+
+        /* GET
+         * [api/admin/products]
+         * No body required
+         * returns a list of products see product model for details
+         */
         [HttpGet("products")]
         public IActionResult GetProducts() {
 
@@ -39,7 +45,11 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+         /* GET
+         * [/api/admin/products/{int}]
+         * No body required
+         * returns a product see product model for details
+         */
         [HttpGet("products/{id}")]
         public IActionResult GetProduct(int Id) {
             try
@@ -58,7 +68,16 @@ namespace WebStore.UI.Controllers
             }
 
         }
-
+        /* POST
+         * [admin/products]
+         * Creates a new product
+         * body {
+         * name: String,
+         * description: String,
+         * productImage: File .gif .png .jpg .jpeg(optional)
+         * }
+         * Returns new Product
+         */
         [HttpPost("products")]
         public async Task<IActionResult> CreateProduct([FromForm] CreateProduct.Request req) {
             try
@@ -74,7 +93,16 @@ namespace WebStore.UI.Controllers
             }
 
         }
-
+        /* PUT
+         * [admin/products]
+         * Updates a new product
+         * body {
+         * name: String,
+         * description: String,
+         * productImage: File .gif .png .jpg .jpeg(optional)
+         * }
+         * Returns new Product
+         */
         [HttpPut("products")]
         public async Task<IActionResult> UpdateProduct([FromForm] UpdateProduct.Request req)
         {
@@ -93,7 +121,10 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+        /* DELETE
+         * [admin/products/{int}]
+         * Deletes product matching the id
+         */
         [HttpDelete("products/{id}")]
         public async Task<IActionResult> DeleteProduct(int Id)
         {
@@ -114,6 +145,13 @@ namespace WebStore.UI.Controllers
         /*
          *  [ --inventory-- ]
          */
+
+
+        /* GET
+         * [/api/admin/inventory]
+         * No body required
+         * returns a list of inventories see inventory model for details
+         */
         [HttpGet("inventory")]
         public IActionResult GetInventory()
         {
@@ -128,6 +166,16 @@ namespace WebStore.UI.Controllers
             }
         }
 
+
+        /* POST
+         * [admin/products]
+         * Creates a new inventory
+         * body {
+         * description: String,
+         * inventoryImage: File .gif .png .jpg .jpeg(optional)
+         * }
+         * Returns new Inventory
+         */
         [HttpPost("inventory")]
         public async Task<IActionResult> CreateInventory([FromForm] CreateInventory.Request req)
         {
@@ -142,11 +190,18 @@ namespace WebStore.UI.Controllers
             }
             catch (Exception e)
             {
-
                 return StatusCode(500);
             }
         }
-
+        /* PUT
+         * [admin/products]
+         * Updates an inventory
+         * body {
+         * description: String,
+         * inventoryImage: File .gif .png .jpg .jpeg(optional)
+         * }
+         * Returns updated Inventory
+         */
         [HttpPut("inventory")]
         public async Task<IActionResult> UpdateInventory([FromForm] UpdateInventory.Request req)
         {
@@ -166,7 +221,10 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+        /* DELETE
+         * [admin/inventory/{int}]
+         * Deletes inventory matching the id
+         */
         [HttpDelete("inventory/{id}")]
         public async Task<IActionResult> DeleteInventoryt(int Id)
         {
@@ -187,6 +245,12 @@ namespace WebStore.UI.Controllers
          *  [ --Orders-- ]
          */
 
+
+        /* GET
+        * [/api/admin/orders/id/{int}]
+        * No body required
+        * returns an order see order model for details
+        */
         [HttpGet("orders/id/{id}")]
         public IActionResult GetOrderById(int Id)
         {
@@ -203,6 +267,12 @@ namespace WebStore.UI.Controllers
             }
         }
 
+        /* GET
+        * [/api/admin/orders/status/{string}]
+        * acceptable statuses: "ordered", "shipped", "fulfilled"
+        * No body required
+        * returns a list of orders see order model for details
+        */
         [HttpGet("orders/status/{status}")]
         public IActionResult GetOrderByStatus(string status)
         {
@@ -222,7 +292,15 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+        /* GET
+        * [/api/admin/orders}]
+        * acceptable statuses: "ordered", "shipped", "fulfilled"
+        * No body required
+        * returns a list of shorten orders
+        * {
+        * id,name,email,phone,status,total,orderdate,note
+        * }
+        */
         [HttpGet("orders")]
         public IActionResult GetOrders()
         {
@@ -235,7 +313,19 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+        /* POST
+        * [/api/admin/orders]
+        * body
+        * {
+        *   cart: array of {inventoryId, quantity},
+        *   customerInfomation: {firstName,lastName,email,
+        *   phone,address1,address2,city,postCode,state,country},
+        *   status: string,
+        *   note: string
+        *   total: double
+        * }
+        * returns a new order see order model for details
+        */
         [HttpPost("orders")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrder.Request req) {
             if (req == null || req.Cart == null ||
@@ -259,7 +349,19 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+        /* Put
+        * [/api/admin/orders]
+        * body
+        * {
+        *   cart: array of {inventoryId, quantity},
+        *   customerInfomation: {firstName,lastName,email,
+        *   phone,address1,address2,city,postCode,state,country},
+        *   status: string,
+        *   note: string
+        *   total: double
+        * returns an updated order see order model for details
+        * }
+        */
         [HttpPut("orders")]
         public async Task<IActionResult> UpdateOrder([FromBody] UpdateOrder.Request req){
             if (req == null || req.Cart == null || 
@@ -279,7 +381,10 @@ namespace WebStore.UI.Controllers
 
             return Ok(response.Order);
         }
-
+        /* DELETE
+         * [admin/orders/{int}]
+         * Deletes order matching the id
+         */
         [HttpDelete("orders/{id}")]
         public async Task<IActionResult> DeleteOrder(int Id)
         {

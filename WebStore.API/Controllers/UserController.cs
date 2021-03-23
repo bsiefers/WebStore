@@ -22,7 +22,12 @@ namespace WebStore.API.Controllers
             _context = context;
             _jwtConfig = new JWTConfig { Key = config["JWT:Key"], Issuer = config["JWT:Issuer"] };
         }
-
+        /* POST
+         * [api/users/login]
+         * body{email, password}
+         * logins an user with a JWT
+         * returns a JWT
+         */
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginUser.Request request) {
             try
@@ -41,6 +46,13 @@ namespace WebStore.API.Controllers
                 return StatusCode(500);
             }
         }
+
+        /* POST
+         * [api/users/login]
+         * body{email, password}
+         * creates a new user
+         * returns a JWT
+         */
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] CreateUser.Request request)
         {

@@ -58,6 +58,8 @@ namespace WebStore.Application.Orders
                     Address2 = request.CustomerInformation.Address2,
                     City = request.CustomerInformation.City,
                     PostCode = request.CustomerInformation.PostCode,
+                    State = request.CustomerInformation.State,
+                    Country = request.CustomerInformation.Country
                 },
                 StripeReference = charge.Id,
                 Inventory = request.Cart.Select(x => new CreateOrder.Inventory
@@ -88,6 +90,8 @@ namespace WebStore.Application.Orders
             public string Address1 { get; set; }
             public string Address2 { get; set; }
             public string City { get; set; }
+            public string State { get; set; }
+            public string Country { get; set; }
             public string PostCode { get; set; }
         }
 

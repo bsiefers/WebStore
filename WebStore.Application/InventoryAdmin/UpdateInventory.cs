@@ -22,6 +22,8 @@ namespace WebStore.Application.InventoryAdmin
             Inventory inventory = _context.Inventory.Where(x => x.Id == req.Id).FirstOrDefault();
             if (inventory == null)
                 return new Response { Status = 404 };
+
+            //if uploaded image is null then just updates non-image data
             if (req.InventoryImage == null || req.InventoryImage.Length == 0)
             {
                 inventory.Quantity = req.Quantity;
@@ -49,7 +51,7 @@ namespace WebStore.Application.InventoryAdmin
 
                 if (!allowExtentions.Contains(extention) || req.InventoryImage.Length > maxSize)
                     return new Response { Status = 400 };
-
+                //copies image to memory and stores it as a 64-bit string in the database
                 using (var ms = new MemoryStream())
                 {
                     req.InventoryImage.CopyTo(ms);

@@ -28,7 +28,7 @@ namespace WebStore.Application.ProductsAdmin
                 Name = req.Name,
                 Description = req.Description
             };
-
+            //if uploaded image is null then just updates non-image data
             if (req.ProductImage == null || req.ProductImage.Length == 0)
             {
 
@@ -51,7 +51,7 @@ namespace WebStore.Application.ProductsAdmin
 
                 if (!allowExtentions.Contains(extention) || req.ProductImage.Length > maxSize)
                     return null;
-
+                //copies to memory and stores it as a 64-bit string in the database
                 using (var ms = new MemoryStream())
                 {
                     req.ProductImage.CopyTo(ms);

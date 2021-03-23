@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +23,7 @@ namespace WebStore.Application.OrdersAdmin
         }
         public async Task<Response> Do(Request request)
         {
+            //set updated order info
             var order = _context.Orders.FirstOrDefault(x => x.Id == request.OrderId);
             if (order == null)
                 return new Response { Status = 404 };
@@ -39,7 +40,8 @@ namespace WebStore.Application.OrdersAdmin
             order.Country = request.CustomerInformation.Country;
             order.Note = request.Note;
             order.Total = request.Total;
-
+            //find difference in new and old ordered items
+            //add/subtract the difference to their respective inventories
             List<OrderInventory> newItems = new List<OrderInventory>();
             foreach(var item in request.Cart)
             {

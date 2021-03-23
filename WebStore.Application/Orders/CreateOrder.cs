@@ -63,6 +63,8 @@ namespace WebStore.Application.Orders
                     Address2 = request.CustomerInformation.Address2,
                     City = request.CustomerInformation.City,
                     PostCode = request.CustomerInformation.PostCode,
+                    State = request.CustomerInformation.State,
+                    Country = request.CustomerInformation.Country,
                     OrderInventory = request.Inventory.Select(x => new OrderInventory
                     {
                         InventoryId = x.InventoryId,
@@ -87,6 +89,8 @@ namespace WebStore.Application.Orders
             public string Phone { get; set; }
             public string Address1 { get; set; }
             public string Address2 { get; set; }
+            public string State { get; set; }
+            public string Country { get; set; }
             public string City { get; set; }
             public string PostCode { get; set; }
         }

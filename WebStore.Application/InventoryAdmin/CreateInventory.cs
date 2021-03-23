@@ -25,7 +25,7 @@ namespace WebStore.Application.InventoryAdmin
                 Price = req.Price,
                 Quantity = req.Quantity
             };
-
+            //if uploaded image is null then just updates non-image data
             if (req.InventoryImage == null || req.InventoryImage.Length == 0)
             {
 
@@ -49,7 +49,7 @@ namespace WebStore.Application.InventoryAdmin
 
                 if (!allowExtentions.Contains(extention) || req.InventoryImage.Length > maxSize)
                     return null;
-
+                //copies image to memory and stores it as a 64-bit string in the database
                 using (var ms = new MemoryStream())
                 {
                     req.InventoryImage.CopyTo(ms);

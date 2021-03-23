@@ -23,6 +23,7 @@ namespace WebStore.Application.ProductsAdmin
             var product = _context.Products.FirstOrDefault(x => x.Id == req.Id);
             if (product == null)
                 return new Response { Status = 404 };
+            //if uploaded image is null then just updates non-image data
             if (req.ProductImage == null || req.ProductImage.Length == 0)
             {
                 product.Name = req.Name;
@@ -49,7 +50,7 @@ namespace WebStore.Application.ProductsAdmin
 
                 if (!allowExtentions.Contains(extention) || req.ProductImage.Length > maxSize)
                     return new Response { Status = 400};
-
+                //copies to memory and stores it as a 64-bit string in the database
                 using (var ms = new MemoryStream())
                 {
                     req.ProductImage.CopyTo(ms);

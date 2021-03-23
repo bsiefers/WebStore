@@ -15,7 +15,11 @@ namespace WebStore.UI.Controllers
         {
             _context = context;
         }
-        
+        /* POST
+         * [/api/orders/payment]
+         * {customerInfomation:{firstName, lastName, phone, postCode, city, },}
+         * creates a payment and its respective order
+         */
         [HttpPost("orders/payment")]
         public IActionResult CreatePayment([FromBody] CreatePayment.Request request)
         {
@@ -43,8 +47,12 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-        
-        [HttpGet("orders/{reference}")]
+
+        /* GET
+         * [/api/orders/{int}]
+         * gets the reference for an order
+         */
+        [HttpGet("orders/{int}")]
         public IActionResult GetOrder(int Id)
         {
             try

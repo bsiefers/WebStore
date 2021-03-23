@@ -16,20 +16,6 @@ namespace WebStore.Application.OrdersAdmin
         {
             _context = context;
         }
-        private int CalculateOrderAmount(IEnumerable<CartItem> items)
-        {
-            int amount = 0;
-            IEnumerable<int> inventoryIds = items.Select(item => item.Id);
-            var inventory = _context.Inventory.Include(x => x.Product).Where(x => inventoryIds.Contains(x.Id));
-
-            foreach (var item in inventory)
-            {
-                int quantity = items.Where(x => x.Id == item.Id).Select(x => x.Quantity).FirstOrDefault();
-                amount += (int)(item.Product.Price * 100) * quantity;
-            }
-
-            return amount;
-        }
 
         public async Task<Response> Do(Request req)
         {
@@ -55,9 +41,11 @@ namespace WebStore.Application.OrdersAdmin
                 Total = req.Total,
                 Note = req.Note
             };
+
+            //get ids their inventories update the add items
             IEnumerable<int> inventoryIds = req.Cart.Select(item => item.Id);
             var inventory = _context.Inventory.Include(x => x.Product).Where(x => inventoryIds.Contains(x.Id));
-
+            //for each item if not enough stock return null
             foreach (var item in inventory)
             {
                 int quantity = req.Cart.Where(x => x.Id == item.Id).Select(x => x.Quantity).FirstOrDefault();

@@ -18,7 +18,11 @@ namespace WebStore.UI.Controllers
         {
             _context = context;
         }
-
+        /* GET
+         * [/api/products]
+         * No body required
+         * returns a list of products that have atleast one inventory see product model for details
+         */
         [HttpGet("products")]
         public IActionResult GetProducts()
         {
@@ -31,7 +35,11 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
-
+        /* GET
+         * [/api/products/{string}]
+         * No body required
+         * returns a product
+         */
         [HttpGet("products/{name}")]
         public IActionResult GetProduct(string name)
         {
@@ -51,7 +59,11 @@ namespace WebStore.UI.Controllers
             }
         }
 
-
+        /* GET
+         * [/api/products/{int}]
+         * No body required
+         * returns a product
+         */
         [HttpGet("products/getByIventoryId/{Id}")]
         public IActionResult GetProductByInventoryId(int Id) {
             try
