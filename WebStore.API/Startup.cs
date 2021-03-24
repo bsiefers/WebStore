@@ -34,15 +34,17 @@ namespace WebStore.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["DefaultConnection"]));
+            var clientServer = Configuration["clientServer"];
+
             services.AddCors(options =>
             {
-            options.AddPolicy("CorsPolicy", builder =>           
-                builder
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowAnyOrigin()
-                    .Build()                
-            );
+                options.AddPolicy("CorsPolicy", builder =>           
+                    builder
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithOrigins(clientServer)
+                        .Build()                
+                );
             });
                         
             services.AddControllers();
