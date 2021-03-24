@@ -45,6 +45,7 @@ namespace WebStore.Application.Orders
             {
                 var ids = request.Inventory.Select(x => x.InventoryId).ToArray();
                 var inventoryToUpdate = _context.Inventory.Where(x => ids.Contains(x.Id)).ToList();
+                //update inventory
                 foreach (var inventory in inventoryToUpdate)
                 {
                     if (inventory.Quantity - request.Inventory.FirstOrDefault(x => x.InventoryId == inventory.Id).Quantity < 0)

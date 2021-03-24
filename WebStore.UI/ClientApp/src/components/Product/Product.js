@@ -60,7 +60,7 @@ export default class Product extends Component {
                 this.state.product.inventory[this.state.selectedItem].id,
                 this.state.amount,
                 this.state.product.name,
-                this.state.product.price.substring(1),
+                this.state.product.inventory[this.state.selectedItem].price,
                 this.state.product.inventory[this.state.selectedItem].description
             );
             this.toggleModal(true);
@@ -116,10 +116,9 @@ export default class Product extends Component {
                                                     <p className="has-text-weight-semibold has-text-warning">Only {this.state.product.inventory[this.state.selectedItem].stock} remain!</p>}
                                                 {this.state.product.inventory[this.state.selectedItem].stock === 0 &&
                                                     <p className="has-text-weight-semibold has-text-danger">Out Of Stock!</p>}
+                                                <p>${this.state.product.inventory[this.state.selectedItem].price}</p>
                                                 <p>{this.state.product.description}</p>
                                             </header>
-                                            <main>
-                                            </main>
                                             <footer>
                                                 <form onSubmit={this.onSubmit.bind(this)}>
                                                     <div className="field is-horizontal">
@@ -145,8 +144,7 @@ export default class Product extends Component {
                                                     <div className="field is-horizontal">
                                                         <div className="field-label is-normal">
                                                             <label className="label">Quantity</label>
-                                                        </div>
-                                                        
+                                                        </div>                                                        
                                                         <div className="field-body">
                                                             <div className="field is-narrow">
                                                                 <div className="control">

@@ -14,6 +14,8 @@ export default class CustomerDetailsForm extends Component {
                 email: "",
                 phone: "",
                 city: "",
+                country: "",
+                state: "",
                 postCode: "",
                 address1: "",
                 address2: ""
@@ -83,6 +85,17 @@ export default class CustomerDetailsForm extends Component {
                                 <div style={inlineBlock}>
                                     <div className="has-text-left"><label>Postcode*</label> </div>
                                     <input className="input" onChange={this.onChangeCustomerInfo} name="postCode" value={this.state.customerInfo.postCode} required></input>
+                                </div>
+                            </div>
+                            <div className="has-text-weight-medium">
+                                <div style={inlineBlock}>
+                                    <div className="has-text-left"><label>State/Province*</label></div>
+                                    <input className="input" onChange={this.onChangeCustomerInfo} name="state" value={this.state.customerInfo.state} required></input>
+                                </div>
+                                {"  "}
+                                <div style={inlineBlock}>
+                                    <div className="has-text-left"><label>Country*</label> </div>
+                                    <input className="input" onChange={this.onChangeCustomerInfo} name="country" value={this.state.customerInfo.country} required></input>
                                 </div>
                             </div>
                             <div className="has-text-weight-medium">

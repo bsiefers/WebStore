@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using WebStore.Application.Orders;
 using WebStore.Database;
@@ -42,7 +43,7 @@ namespace WebStore.UI.Controllers
 
                 return Ok(response);
             }
-            catch
+            catch(Exception e)
             {
                 return StatusCode(500);
             }

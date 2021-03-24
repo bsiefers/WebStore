@@ -28,7 +28,7 @@ namespace WebStore.Application.Orders
             foreach(var item in inventory)
             {
                 int quantity = items.Where(x => x.Id == item.Id).Select(x => x.Quantity).FirstOrDefault();
-                amount += (int)(item.Product.Price * 100) * quantity;
+                amount += (int)(item.Price * 100) * quantity;
             }
 
             return amount;
@@ -37,7 +37,7 @@ namespace WebStore.Application.Orders
         public Response Do(Request request)
         {
             var token = request.Token;
-
+            //used to create payment for stripe
             var options = new ChargeCreateOptions
             {
                 Amount = CalculateOrderAmount(request.Cart),
@@ -47,6 +47,8 @@ namespace WebStore.Application.Orders
             };
             var service = new ChargeService();
             var charge = service.Create(options);
+
+
             new CreateOrder(_context).Do(new CreateOrder.Request
             {
                 CustomerInformation = new CreateOrder.CustomerInformation { 
