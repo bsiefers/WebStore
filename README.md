@@ -33,5 +33,5 @@
 3. Create/Connect MySQL database.
 > dotnet ef --startup-project ../WebStore.API migrations add Data
 
-> dotnet ef --startup-project ../WebStore.API database update``
+> dotnet ef --startup-project ../WebStore.API database update
 4. Start the program.

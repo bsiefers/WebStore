@@ -36,16 +36,15 @@ namespace WebStore.API
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["DefaultConnection"]));
             services.AddCors(options =>
             {
-                options.AddPolicy("CorsPolicy", builder => 
-                    builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()                       
-                        .Build()
-                    );
+            options.AddPolicy("CorsPolicy", builder =>           
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin()
+                    .Build()                
+            );
             });
-            
-            services.AddSwaggerGen();
+                        
             services.AddControllers();
             services.AddAuthorization(options =>
             {
@@ -78,15 +77,8 @@ namespace WebStore.API
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseSwagger();
+           
             app.UseCors("CorsPolicy");
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
             app.UseHttpsRedirection();
 
             app.UseRouting();

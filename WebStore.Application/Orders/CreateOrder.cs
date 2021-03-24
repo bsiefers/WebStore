@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using WebStore.Database;
 using WebStore.Models;
 
@@ -11,14 +12,14 @@ namespace WebStore.Application.Orders
     public class CreateOrder
     {
         private static CreateOrder instance = null;
-        private static readonly object padlock = new object();
-
+        private static readonly object padlock = new object();        
         CreateOrder()
-        {
+        {            
         }
 
         public static CreateOrder Instance
         {
+            
             get
             {
                 lock (padlock)

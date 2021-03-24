@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,11 @@ namespace WebStore.UI.Controllers
     public class ProductController : ControllerBase
     {
         private ApplicationDbContext _context;
-
-        public ProductController(ApplicationDbContext context)
+        private ILogger<ProductController> _logger;
+        public ProductController(ApplicationDbContext context, ILogger<ProductController> logger)
         {
             _context = context;
+            _logger = logger;
         }
         /* GET
          * [/api/products]
@@ -28,10 +30,14 @@ namespace WebStore.UI.Controllers
         {
             try
             {
-                return Ok(new GetProducts(_context).Do());
+                var response = new GetProducts(_context).Do();
+                _logger.LogInformation("Get request for products retrieved: " + response.Count() + "records.");
+                return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -46,15 +52,23 @@ namespace WebStore.UI.Controllers
             try
             {
                 if (name == null)
+                {
+                    _logger.LogDebug("Get request failed because name given was null");
                     return BadRequest();
+                }
                 var response = new GetProduct(_context).Do(name);
                 if (response == null)
+                {
+                    _logger.LogDebug("Get request failed because product with name " + name + " was not found");
                     return NotFound();
-
+                }
+                _logger.LogInformation("Get request for products retrieved for prduct: " + response.Name);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -70,12 +84,17 @@ namespace WebStore.UI.Controllers
             {
                 var response = new GetProductByInventoryId(_context).Do(Id);
                 if (response == null)
+                {
+                    _logger.LogDebug("Get request failed because product with ID " + Id + " was not found");
                     return NotFound();
-
+                }
+                _logger.LogInformation("Get request for products retrieved for prduct: " + response.Name);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }

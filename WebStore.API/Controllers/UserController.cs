@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using WebStore.Application.CreateUser;
 using WebStore.Application.LoginUser;
@@ -16,7 +18,8 @@ namespace WebStore.API.Controllers
         private IConfiguration _config;
         private JWTConfig _jwtConfig;
         private ApplicationDbContext _context;
-        public UserController(IConfiguration config, ApplicationDbContext context)
+        private ILogger<UserController> _logger;
+        public UserController(IConfiguration config, ApplicationDbContext context, ILogger<UserController> logger)
         {
             _config = config;
             _context = context;
@@ -33,16 +36,23 @@ namespace WebStore.API.Controllers
             try
             {
                 if (request == null || request.Email == null || request.Password == null)
+                {
+                    _logger.LogDebug("Login request failed because atleast one part is null");
                     return BadRequest();
+                }
                 var response = new LoginUser(_jwtConfig, _context).Do(request);
                 if (response.Token == null)
+                {
+                    _logger.LogDebug("Login request failed because email password combination didn\'t match.");
                     return Unauthorized();
-
+                }
 
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -59,16 +69,23 @@ namespace WebStore.API.Controllers
             try
             {
                 if (request == null || request.Email == null || request.Password == null)
+                {
+                    _logger.LogDebug("Signup request failed because atleast one part is null");
                     return BadRequest();
+                }
                 var response = await new CreateUser(_jwtConfig, _context).Do(request);
                 if (response.Token == null)
+                {
+                    _logger.LogDebug("Signup request failed because there already exists an email with the record.");
                     return Conflict();
-            
-                return Ok(response);            
+                }
 
+                return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }

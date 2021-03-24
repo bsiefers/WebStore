@@ -8,7 +8,7 @@ using WebStore.Application.InventoryAdmin;
 using WebStore.Application.ProductsAdmin;
 using WebStore.Application.OrdersAdmin;
 using WebStore.Database;
-
+using Microsoft.Extensions.Logging;
 
 namespace WebStore.UI.Controllers
 {
@@ -18,11 +18,13 @@ namespace WebStore.UI.Controllers
     public class AdminController : ControllerBase
     {
         private ApplicationDbContext _context;
-
-        public AdminController(ApplicationDbContext context)
+        private ILogger _logger;
+        public AdminController(ApplicationDbContext context, ILogger<AdminController> logger)
         {
             _context = context;
+            _logger = logger;
         }
+
         /*
          *  [ --Products-- ]
          */
@@ -38,10 +40,14 @@ namespace WebStore.UI.Controllers
             try
             {
                 GetProducts.Response response = new GetProducts(_context).Do();
+                _logger.LogInformation("GET request for Products");
+                _logger.LogInformation("response size: " + response.PVM.Count());
                 return Ok(response.PVM);
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -56,14 +62,20 @@ namespace WebStore.UI.Controllers
             {
                 var response = new GetProduct(_context).Do(Id);
                 if (response == null)
+                {
+                    _logger.LogInformation("Product Id Not Found: " + Id);
                     return NotFound();
+                }
                 else
                 {
+                    _logger.LogInformation("GET Request For Product: " + Id);
                     return Ok(response);
                 }
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
 
@@ -83,12 +95,22 @@ namespace WebStore.UI.Controllers
             try
             {
                 if (req == null || req.Description == null || req.Name == null)
+                {
+                    _logger.LogDebug("Create product request failed because of atleast one part is null");
                     return BadRequest();
+                }                
                 var response = await new CreateProduct(_context).Do(req);
+                if(response == null)
+                {
+                    _logger.LogDebug("Create product request failed because the uploaded image type is not allowed.");
+                }
+                _logger.LogInformation("Product created: " + response.Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
 
@@ -109,15 +131,31 @@ namespace WebStore.UI.Controllers
             try
             {
                 if (req == null || req.Description == null || req.Name == null)
+                {
+                    _logger.LogDebug("Update product request failed because of atleast one part is null");
                     return BadRequest();
+                }
                 var response = await new UpdateProduct(_context).Do(req);
                 if (response.Status != 200)
+                {
+                    _logger.LogDebug("Update product request failed because " +
+                        (response.Status == 404 ?
+                        "the id given didn\'t match any records." :
+                        "the uploaded image doesn\'t match any allow types."
+                        )
+                    );
                     return StatusCode(response.Status);
+                }
                 else
+                {
+                    _logger.LogInformation("Product updated: " + response.Product.Id);
                     return Ok(response.Product);
+                }
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -132,12 +170,17 @@ namespace WebStore.UI.Controllers
             {
                 var response = await new DeleteProduct(_context).Do(Id);
                 if (response == null)
-                    return BadRequest();
-
+                {
+                    _logger.LogDebug("Product deletion request failed because the " + Id + " ID was not found.");
+                    return NotFound();
+                }
+                _logger.LogInformation("Product deleted: " + Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -158,10 +201,13 @@ namespace WebStore.UI.Controllers
             try
             {
                 var response = new GetInventory(_context).Do();
+                _logger.LogInformation("GET request for inventories return a size of: " + response.Count());
                 return Ok(response);
             }
-            catch
-            {
+            catch (Exception e)
+            {                
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -182,14 +228,22 @@ namespace WebStore.UI.Controllers
             try
             {
                 if (req == null || req.Description == null)
+                {
+                    _logger.LogDebug("Create inventory request failed because of atleast one part is null");
                     return BadRequest();
+                }
                 var response = await new CreateInventory(_context).Do(req);
                 if (response == null)
+                {
+                    _logger.LogDebug("Create inventory request failed because the uploaded image type is not allowed.");
                     return BadRequest();
+                }
                 return Ok(response);
             }
             catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -209,15 +263,29 @@ namespace WebStore.UI.Controllers
             {
                 if (req == null)
                     return BadRequest();
-                var response = await new UpdateInventory(_context).Do(req);                
-                
+                var response = await new UpdateInventory(_context).Do(req);
+
                 if (response.Status != 200)
+                {
+                    _logger.LogDebug("Update inventory request failed because " +
+                        (response.Status == 404 ?
+                        "the id given didn\'t match any records." :
+                        "the uploaded image doesn\'t match any allow types."
+                        )
+                    );
+
                     return StatusCode(response.Status);
+                }
                 else
-                    return Ok(response.Inventory);                               
+                {
+                    _logger.LogInformation("Inventory created: " + response.Inventory.Id);
+                    return Ok(response.Inventory);
+                }
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -232,11 +300,17 @@ namespace WebStore.UI.Controllers
             {
                 var response = await new DeleteInventory(_context).Do(Id);
                 if (response == null)
+                {
+                    _logger.LogDebug("Inventory deletion request failed because the " + Id + " ID was not found.");
                     return NotFound();
+                }
+                _logger.LogInformation("Product deleted: " + Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -258,11 +332,17 @@ namespace WebStore.UI.Controllers
             {
                 var response = new GetOrder(_context).Do(Id);
                 if (response == null)
+                {
+                    _logger.LogDebug("Order ID Not Found: " + Id);
                     return NotFound();
+                }
+                _logger.LogInformation("GET request for order: " + Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -277,18 +357,27 @@ namespace WebStore.UI.Controllers
         public IActionResult GetOrderByStatus(string status)
         {
             if (status == null)
+            {
+                _logger.LogDebug("GET request for orders failed because status was null");
                 return BadRequest();
+            }
             var acceptableStatuses = new List<string> { "ordered", "shipped", "fulfilled" };
             status = status.ToLower();
             if (!acceptableStatuses.Contains(status))
+            {
+                _logger.LogDebug("GET request for orders failed because status isn\'t in allowed statuses");
                 return BadRequest();
-
+            }
             try
             {
-                return Ok(new GetOrderByStatus(_context).Do(status));
+                var response = new GetOrderByStatus(_context).Do(status);
+                _logger.LogInformation("GET request for order size: " + response.Order.Count());
+                return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -306,10 +395,14 @@ namespace WebStore.UI.Controllers
         {
             try
             {                
-                return Ok(new GetOrders(_context).Do());
+                var response = new GetOrders(_context).Do();
+                _logger.LogInformation("GET request for orders size: " + response.Orders.Count());
+                return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -330,22 +423,34 @@ namespace WebStore.UI.Controllers
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrder.Request req) {
             if (req == null || req.Cart == null ||
                 req.Status == null)
+            {
+                _logger.LogDebug("Create order request failed because of atleast one part is null");
                 return BadRequest();
+            }
             if (req.CustomerInformation == null || req.CustomerInformation.FirstName == null ||
                 req.CustomerInformation.LastName == null || req.CustomerInformation.Phone == null ||
                 req.CustomerInformation.PostCode == null || req.CustomerInformation.Email == null ||
                 req.CustomerInformation.Address1 == null)
+            {
+                _logger.LogDebug("Create order request failed because of atleast one part is null");
                 return BadRequest();
+            }
             try 
             { 
                 var response = await new CreateOrder(_context).Do(req);
-                
+
                 if (response == null)
+                {
+                    _logger.LogDebug("Create order request failed because one of ordered items exceeded the available stock.");
                     return Conflict();
+                }
+                _logger.LogInformation("Order created: " + response.Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -364,22 +469,42 @@ namespace WebStore.UI.Controllers
         */
         [HttpPut("orders")]
         public async Task<IActionResult> UpdateOrder([FromBody] UpdateOrder.Request req){
-            if (req == null || req.Cart == null || 
-                req.Status == null)
-                return BadRequest();
-            if (req.CustomerInformation == null || req.CustomerInformation.FirstName == null ||
-                req.CustomerInformation.LastName == null || req.CustomerInformation.Phone == null ||
-                req.CustomerInformation.PostCode == null || req.CustomerInformation.Email == null ||
-                req.CustomerInformation.Address1 == null)
-                return BadRequest();
+            try
+            {
+                if (req == null || req.Cart == null ||
+                    req.Status == null)
+                {
+                    _logger.LogDebug("Update order request failed because of atleast one part is null");
+                    return BadRequest();
+                }
+                if (req.CustomerInformation == null || req.CustomerInformation.FirstName == null ||
+                    req.CustomerInformation.LastName == null || req.CustomerInformation.Phone == null ||
+                    req.CustomerInformation.PostCode == null || req.CustomerInformation.Email == null ||
+                    req.CustomerInformation.Address1 == null)
+                {
+                    _logger.LogDebug("Update order request failed because of atleast one part is null");
+                    return BadRequest();
+                }
 
-            var response = await new UpdateOrder(_context).Do(req);
-            if (response.Status == 409)
-                return Conflict();
-            if (response.Status == 404)
-                return NotFound();
+                var response = await new UpdateOrder(_context).Do(req);
+                if (response.Status == 409)
+                {
+                    _logger.LogDebug("Update order request failed because one of ordered items exceeded the available stock.");
+                    return Conflict();
+                }
+                if (response.Status == 404)
+                {
+                    _logger.LogDebug("Update order request failed because order with ID " + req.OrderId + " was not found.");
+                    return NotFound();
+                }
 
-            return Ok(response.Order);
+                return Ok(response.Order);
+            }catch (Exception e)
+            {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
+                return StatusCode(500);
+            }
         }
         /* DELETE
          * [admin/orders/{int}]
@@ -389,14 +514,20 @@ namespace WebStore.UI.Controllers
         public async Task<IActionResult> DeleteOrder(int Id)
         {
             try
-            {
+            {                
                 var response = await new DeleteOrder(_context).Do(Id);
                 if (response == null)
+                {
+                    _logger.LogDebug("Delete request failed because order with ID" + Id + " was not found.");
                     return NotFound();
+                }
+                _logger.LogInformation("Order Deleted: "  + Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }

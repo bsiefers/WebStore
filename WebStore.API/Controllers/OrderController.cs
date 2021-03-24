@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using WebStore.Application.Orders;
@@ -11,9 +12,10 @@ namespace WebStore.UI.Controllers
     public class OrderController : ControllerBase
     {
         private ApplicationDbContext _context;
-
-        public OrderController(ApplicationDbContext context)
+        private ILogger<OrderController> _logger;
+        public OrderController(ApplicationDbContext context, ILogger<OrderController> logger)
         {
+            _logger = logger;
             _context = context;
         }
         /* POST
@@ -27,24 +29,34 @@ namespace WebStore.UI.Controllers
             try
             {
                 if (request == null || request.Cart == null)
+                {
+                    _logger.LogDebug("Create payment request failed because of atleast one part is null");
                     return BadRequest();
+                }
 
                 if (request.CustomerInformation == null || request.CustomerInformation.FirstName == null ||
                     request.CustomerInformation.LastName == null || request.CustomerInformation.Phone == null ||
                     request.CustomerInformation.PostCode == null || request.CustomerInformation.Email == null ||
                     request.CustomerInformation.Address1 == null)
+                {
+                    _logger.LogDebug("Create payment request failed because of atleast one part is null");
                     return BadRequest();
-
+                }
                 
 
                 var response = new CreatePayment(_context).Do(request);
                 if (response == null)
+                {
+                    _logger.LogDebug("Create payment request failed when trying to create payment with Stripe.");
                     return BadRequest();
-
+                }
+                _logger.LogInformation("Created payment for associated email " + request.CustomerInformation.Email + ".");
                 return Ok(response);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
@@ -60,12 +72,17 @@ namespace WebStore.UI.Controllers
             {
                 var response = new GetOrder(_context).Do(Id);
                 if (response == null)
+                {
+                    _logger.LogDebug("Order with ID " + Id + " was not found.");
                     return NotFound();
-
+                }
+                _logger.LogDebug("Order get request for: " + Id);
                 return Ok(response);
             }
-            catch
+            catch (Exception e)
             {
+                _logger.LogError(e.Message);
+                _logger.LogError(e.StackTrace);
                 return StatusCode(500);
             }
         }
