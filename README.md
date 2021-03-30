@@ -6,7 +6,7 @@
 
 1. First pull/download the repo.
 2. Add WebStore.API/AppSettings.json
-** Sample AppSetttings.json**bold
+**Sample AppSetttings.json:
 
 ```json
 {
