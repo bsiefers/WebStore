@@ -33,10 +33,10 @@ namespace WebStore.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            #if TEST
-                        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["TestConnection"]));
+            #if DEBUG || TEST
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["TestConnection"]));
             #else
-                            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["DefaultConnection"]));
+                services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration["DefaultConnection"]));
             #endif
             var clientServer = Configuration["clientServer"];
 
@@ -57,6 +57,7 @@ namespace WebStore.API
                 options.AddPolicy(Policies.Admin, Policies.AdminPolicy());
                 options.AddPolicy(Policies.User, Policies.UserPolicy());
             });
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -68,13 +69,13 @@ namespace WebStore.API
                         ValidIssuer = Configuration["JWT:Issuer"],
                         ValidAudience = Configuration["JWT:Issuer"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
-                    };
-                    
+                    };                    
                 });
             
             services.AddMvc();
+            
         }
-
+        public ServiceProvider ServiceProvider { get; private set; }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {

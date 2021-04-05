@@ -19,9 +19,8 @@ namespace WebStore.UI.Controllers
     {
         private ApplicationDbContext _context;
         private ILogger _logger;
-        public AdminController(ApplicationDbContext context, ILogger<AdminController> logger)
-        {
-            _context = context;
+        public AdminController(ILogger<AdminController> logger)
+        {            
             _logger = logger;
         }
 
@@ -98,7 +97,7 @@ namespace WebStore.UI.Controllers
                 {
                     _logger.LogDebug("Create product request failed because of atleast one part is null");
                     return BadRequest();
-                }                
+                }
                 var response = await new CreateProduct(_context).Do(req);
                 if(response == null)
                 {
@@ -159,6 +158,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* DELETE
          * [admin/products/{int}]
          * Deletes product matching the id
@@ -212,7 +212,6 @@ namespace WebStore.UI.Controllers
             }
         }
 
-
         /* POST
          * [admin/products]
          * Creates a new inventory
@@ -233,12 +232,12 @@ namespace WebStore.UI.Controllers
                     return BadRequest();
                 }
                 var response = await new CreateInventory(_context).Do(req);
-                if (response == null)
+                if (response.Status != 200)
                 {
                     _logger.LogDebug("Create inventory request failed because the uploaded image type is not allowed.");
                     return BadRequest();
                 }
-                return Ok(response);
+                return Ok(response.Inventory);
             }
             catch (Exception e)
             {
@@ -247,6 +246,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* PUT
          * [admin/products]
          * Updates an inventory
@@ -289,6 +289,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* DELETE
          * [admin/inventory/{int}]
          * Deletes inventory matching the id
@@ -299,13 +300,16 @@ namespace WebStore.UI.Controllers
             try
             {
                 var response = await new DeleteInventory(_context).Do(Id);
-                if (response == null)
+                if (response.Status == 404)
                 {
                     _logger.LogDebug("Inventory deletion request failed because the " + Id + " ID was not found.");
                     return NotFound();
                 }
                 _logger.LogInformation("Product deleted: " + Id);
-                return Ok(response);
+                if (response.Status == 200)
+                    return Ok();
+                else
+                    return StatusCode(500);
             }
             catch (Exception e)
             {
@@ -381,6 +385,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* GET
         * [/api/admin/orders}]
         * acceptable statuses: "ordered", "shipped", "fulfilled"
@@ -406,6 +411,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* POST
         * [/api/admin/orders]
         * body
@@ -454,6 +460,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* Put
         * [/api/admin/orders]
         * body
@@ -506,6 +513,7 @@ namespace WebStore.UI.Controllers
                 return StatusCode(500);
             }
         }
+
         /* DELETE
          * [admin/orders/{int}]
          * Deletes order matching the id

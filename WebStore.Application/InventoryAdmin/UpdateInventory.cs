@@ -19,9 +19,13 @@ namespace WebStore.Application.InventoryAdmin
 
         public async Task<Response> Do(Request req)
         {
+            if (req == null || req.Quantity < 0 || req.Price < 0)
+                return new Response { Status = 400 };
+            var product = _context.Products.Where(x => x.Id == req.ProductId).FirstOrDefault();
             Inventory inventory = _context.Inventory.Where(x => x.Id == req.Id).FirstOrDefault();
-            if (inventory == null)
+            if (inventory == null || product == null)
                 return new Response { Status = 404 };
+
 
             //if uploaded image is null then just updates non-image data
             if (req.InventoryImage == null || req.InventoryImage.Length == 0)
@@ -85,10 +89,8 @@ namespace WebStore.Application.InventoryAdmin
             public int Id { get; set; }
             public int ProductId { get; set; }
             public string Description { get; set; }
-            public double Price { get; set; }
-            
+            public double Price { get; set; }            
             public int Quantity { get; set; }
-
             public IFormFile InventoryImage { get; set; }
         }
 

@@ -9,17 +9,18 @@ namespace WebStore.Database
 {
     public class ApplicationDbContext : DbContext
     {
+        public ApplicationDbContext() { }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
 
         }
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Inventory> Inventory { get; set; }
-        public DbSet<Order> Orders { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<OrderInventory> OrderInventory { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Inventory> Inventory { get; set; }
+        public virtual DbSet<Order> Orders { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<OrderInventory> OrderInventory { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

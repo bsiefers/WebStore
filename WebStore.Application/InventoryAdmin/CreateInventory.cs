@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using WebStore.Database;
 using WebStore.Models;
@@ -18,6 +19,12 @@ namespace WebStore.Application.InventoryAdmin
 
         public async Task<Response> Do(Request req)
         {
+            if (req == null || req.Quantity < 0 || req.Price < 0)
+                return new Response { Status = 400 };
+
+            var product = _context.Products.Where(x=> x.Id == req.ProductId).FirstOrDefault();
+            if (product == null) return new Response { Status = 400 };
+
             var inventory = new Inventory
             {
                 ProductId = req.ProductId,
@@ -34,10 +41,14 @@ namespace WebStore.Application.InventoryAdmin
 
                 return new Response
                 {
-                    Id = inventory.Id,
-                    Description = inventory.Description,
-                    Quantity = inventory.Quantity, 
-                    Price = inventory.Price
+                    Status = 201,
+                    Inventory = new InventoryViewModel
+                    {
+                        Id = inventory.Id,
+                        Description = inventory.Description,
+                        Quantity = inventory.Quantity,
+                        Price = inventory.Price
+                    }
                 };
             }
             else
@@ -48,7 +59,7 @@ namespace WebStore.Application.InventoryAdmin
                 string extention = Path.GetExtension(fileName);
 
                 if (!allowExtentions.Contains(extention) || req.InventoryImage.Length > maxSize)
-                    return null;
+                    return new Response { Status = 400 };
                 //copies image to memory and stores it as a 64-bit string in the database
                 using (var ms = new MemoryStream())
                 {
@@ -63,11 +74,14 @@ namespace WebStore.Application.InventoryAdmin
 
                     return new Response
                     {
-                        Id = inventory.Id,
-                        Description = inventory.Description,
-                        Quantity = inventory.Quantity,
-                        Price = inventory.Price,
-                        InventoryImage = "data:image/png;base64," + inventoryImage
+                        Status = 201,
+                        Inventory = new InventoryViewModel { 
+                            Id = inventory.Id,
+                            Description = inventory.Description,
+                            Quantity = inventory.Quantity,
+                            Price = inventory.Price,
+                            InventoryImage = "data:image/png;base64," + inventoryImage 
+                        }
                     };
                 }
             }
@@ -82,13 +96,19 @@ namespace WebStore.Application.InventoryAdmin
             public IFormFile InventoryImage {get; set;}
         }
 
-        public class Response
+
+        public class InventoryViewModel
         {
             public int Id { get; set; }
             public string Description { get; set; }
             public string InventoryImage { get; set; }
             public int Quantity { get; set; }
             public double Price { get; set; }
+        }
+        public class Response
+        {
+            public int Status { get; set; }
+            public InventoryViewModel Inventory { get; set; }
         }
     }
 }

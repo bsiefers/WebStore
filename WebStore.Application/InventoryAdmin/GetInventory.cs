@@ -24,11 +24,12 @@ namespace WebStore.Application.InventoryAdmin
                     
                     Id= x.Id,
                     ProductName = x.Name,
-                    Description = x.Description,                    
+                    Description = x.Description,
                     Inventory = x.Inventory.Select(y => new InventoryViewModel
                     {
                         Id = y.Id,
                         Description = y.Description,
+                        ProductId = y.ProductId,
                         Quantity = y.Quantity,
                         Price = y.Price,
                         InventoryImage = "data:image/png;base64," + y.InventoryImage
@@ -38,6 +39,7 @@ namespace WebStore.Application.InventoryAdmin
                 .ToList();
             return inventory;
         }
+
         public class InventoryViewModel
         {
             public int Id { get; set; }

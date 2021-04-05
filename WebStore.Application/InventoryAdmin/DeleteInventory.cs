@@ -18,12 +18,14 @@ namespace WebStore.Application.InventoryAdmin
         {
             var inventory = _context.Inventory.FirstOrDefault(x => x.Id == Id);
             if (inventory == null)
-                return null;
+                return new Response { Status = 404 };
             _context.Inventory.Remove(inventory);
             await _context.SaveChangesAsync();
-            return new Response { };
+            return new Response { Status = 200 };
         }
 
-        public class Response {}
+        public class Response {
+            public int Status { get; set; }
+        }
     }
 }
