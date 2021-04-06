@@ -19,7 +19,7 @@ namespace WebStore.Application.InventoryAdmin
 
         public async Task<Response> Do(Request req)
         {
-            if (req == null || req.Quantity < 0 || req.Price < 0)
+            if (req == null || req.Quantity < 0 || req.Price < 0 || req.Description == null)
                 return new Response { Status = 400 };
 
             var product = _context.Products.Where(x=> x.Id == req.ProductId).FirstOrDefault();

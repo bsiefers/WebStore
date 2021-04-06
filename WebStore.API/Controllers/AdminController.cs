@@ -99,12 +99,12 @@ namespace WebStore.UI.Controllers
                     return BadRequest();
                 }
                 var response = await new CreateProduct(_context).Do(req);
-                if(response == null)
+                if(response.Status == 400)
                 {
                     _logger.LogDebug("Create product request failed because the uploaded image type is not allowed.");
                 }
-                _logger.LogInformation("Product created: " + response.Id);
-                return Ok(response);
+                _logger.LogInformation("Product created: " + response.Product.Id);
+                return Ok(response.Product);
             }
             catch (Exception e)
             {
@@ -140,7 +140,7 @@ namespace WebStore.UI.Controllers
                     _logger.LogDebug("Update product request failed because " +
                         (response.Status == 404 ?
                         "the id given didn\'t match any records." :
-                        "the uploaded image doesn\'t match any allow types."
+                        "the request was malformed."
                         )
                     );
                     return StatusCode(response.Status);

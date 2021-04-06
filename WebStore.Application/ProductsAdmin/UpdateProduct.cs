@@ -23,6 +23,9 @@ namespace WebStore.Application.ProductsAdmin
             var product = _context.Products.FirstOrDefault(x => x.Id == req.Id);
             if (product == null)
                 return new Response { Status = 404 };
+
+            if (req.Description == null || req.Name == null)
+                return new Response { Status = 400 };
             //if uploaded image is null then just updates non-image data
             if (req.ProductImage == null || req.ProductImage.Length == 0)
             {

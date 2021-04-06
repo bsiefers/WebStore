@@ -22,7 +22,8 @@ namespace WebStore.Application.ProductsAdmin
         public async Task<Response> Do(Request req)
         {
 
-
+            if (req.Description == null || req.Name == null)
+                return new Response { Status = 400 };
             var product = new Product
             {
                 Name = req.Name,
@@ -37,9 +38,12 @@ namespace WebStore.Application.ProductsAdmin
 
                 return new Response
                 {
-                    Id = product.Id,
-                    Name = product.Name,
-                    Description = product.Description
+                    Status = 201,
+                    Product = new ProductViewModel{
+                        Id = product.Id,
+                        Name = product.Name,
+                        Description = product.Description
+                    }
                 };
             }
             else
@@ -50,7 +54,7 @@ namespace WebStore.Application.ProductsAdmin
                 string extention =  Path.GetExtension(fileName);
 
                 if (!allowExtentions.Contains(extention) || req.ProductImage.Length > maxSize)
-                    return null;
+                    return new Response { Status = 400 };
                 //copies to memory and stores it as a 64-bit string in the database
                 using (var ms = new MemoryStream())
                 {
@@ -64,10 +68,14 @@ namespace WebStore.Application.ProductsAdmin
 
                     return new Response
                     {
-                        Id = product.Id,
-                        Name = product.Name,
-                        Description = product.Description,
-                        ProductImage = "data:image/png;base64," + imageBytes
+                       Status = 201,
+                       Product = new ProductViewModel
+                       {
+                           Id = product.Id,
+                           Name = product.Name,
+                           Description = product.Description,
+                           ProductImage = "data:image/png;base64," + imageBytes
+                       }
                     };
                 }
             }
@@ -80,12 +88,18 @@ namespace WebStore.Application.ProductsAdmin
             public IFormFile ProductImage { get; set; }
         }
 
-        public class Response
+        public class ProductViewModel
         {
             public int Id { get; set; }
             public string Name { get; set; }
-            public string Description { get; set; }            
+            public string Description { get; set; }
             public string ProductImage { get; set; }
+        }
+
+        public class Response
+        {
+            public ProductViewModel Product { get; set; }
+            public int Status { get; set; }
         }
     }
 

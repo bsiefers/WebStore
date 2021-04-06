@@ -20,12 +20,15 @@ namespace WebStore.Application.ProductsAdmin
         {
             var product = _context.Products.FirstOrDefault(x => x.Id == Id);
             if (product == null)
-                return null;
+                return new Response { Status = 404 };
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
-            return new Response { };
+            return new Response { Status = 200 };
         }
-        public class Response { }
+        public class Response 
+        { 
+            public int Status { get; set; } 
+        }
     }
 
 
