@@ -16,9 +16,9 @@ namespace WebStore.Application.OrdersAdmin
         }
         public async Task<Response> Do(int Id)
         {            
-            var order = _context.Orders.FirstOrDefault(x => x.Id == Id);
+            var order = _context.Orders.Where(x => x.Id == Id).FirstOrDefault();
             if (order == null)
-                return null;
+                return new Response { Status = 404 };
             Dictionary<int, int> orderedItems = new Dictionary<int, int>();
             foreach(var orderInventory in order.OrderInventory)
             {
@@ -31,12 +31,12 @@ namespace WebStore.Application.OrdersAdmin
             }
             _context.Orders.Remove(order);
             await _context.SaveChangesAsync();
-            return new Response { };
+            return new Response { Status = 200 };
         }
 
         public class Response
         {
-
+            public int Status { get; set; }
         }
     }
 }

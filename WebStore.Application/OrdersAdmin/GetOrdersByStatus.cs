@@ -9,10 +9,10 @@ using WebStore.Models;
 
 namespace WebStore.Application.OrdersAdmin
 {
-    public class GetOrderByStatus
+    public class GetOrdersByStatus
     {
         ApplicationDbContext _context;
-        public GetOrderByStatus(ApplicationDbContext context)
+        public GetOrdersByStatus(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -22,7 +22,7 @@ namespace WebStore.Application.OrdersAdmin
 
             return new Response
             {
-                Order = _context.Orders
+                Orders = _context.Orders
                  .Where(x => x.Status == status)
                  .Include(x => x.OrderInventory)
             };
@@ -30,7 +30,7 @@ namespace WebStore.Application.OrdersAdmin
 
         public class Response
         {
-            public IEnumerable<Order> Order { get; set; }
+            public IEnumerable<Order> Orders { get; set; }
         }
     }
 }

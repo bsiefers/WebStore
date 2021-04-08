@@ -17,8 +17,47 @@ namespace WebStore.Application.OrdersAdmin
             _context = context;
         }
 
+        private bool ValidateRequest(Request request)
+        {
+
+            if (request == null)
+                return false;
+            //cart validation
+            if (request.Cart == null || request.Cart.Count() == 0)
+                return false;
+
+            //custmer info validation
+            if (request.CustomerInformation == null)
+                return false;
+
+            if (request.CustomerInformation.FirstName == null || request.CustomerInformation.FirstName == "" ||
+                request.CustomerInformation.LastName == null || request.CustomerInformation.LastName == "")
+                return false;
+
+            if (request.CustomerInformation.PostCode == null || request.CustomerInformation.PostCode == "" ||
+                request.CustomerInformation.State == null || request.CustomerInformation.State == "")
+                return false;
+
+            if (request.CustomerInformation.Country == null || request.CustomerInformation.Country == "" ||
+                request.CustomerInformation.Address1 == null || request.CustomerInformation.Address1 == "")
+                return false;
+
+            if (request.CustomerInformation.Email == null || request.CustomerInformation.Email == "")
+                return false;
+
+            //Order validation
+            var validStatuses = new[] { "ordered", "shipped", "fufilled" };
+            if (request.Status == null || !(validStatuses.Contains(request.Status.ToLower())))
+                return false;
+            
+            return true;
+        }
+
         public async Task<Response> Do(Request req)
         {
+
+            if (!ValidateRequest(req))
+                return new Response { Status = 400 };
             var order = new Order
             {                
                 FirstName = req.CustomerInformation.FirstName,
@@ -52,7 +91,7 @@ namespace WebStore.Application.OrdersAdmin
                 if (quantity <= item.Quantity)
                     item.Quantity -= quantity;
                 else
-                    return null;
+                    return new Response { Status = 409 };
             }
 
             _context.Orders.Add(order);
@@ -60,14 +99,18 @@ namespace WebStore.Application.OrdersAdmin
 
             return new Response
             {
-                Id = order.Id,
-                Email = order.Email,
-                Phone = order.PhoneNumber,
-                Name = order.FirstName + " " + order.LastName,
-                Status = order.Status,
-                Total = order.Total,
-                OrderDate = order.OrderDate.ToString("MM/dd/yy HH:mm:ss"),
-                Note = order.Note
+                Status = 201,
+                Order = new OrderViewModel
+                {
+                    Id = order.Id,
+                    Email = order.Email,
+                    Phone = order.PhoneNumber,
+                    Name = order.FirstName + " " + order.LastName,
+                    Status = order.Status,
+                    Total = order.Total,
+                    OrderDate = order.OrderDate.ToString("MM/dd/yy HH:mm:ss"),
+                    Note = order.Note
+                }
             };
         }
 
@@ -91,6 +134,18 @@ namespace WebStore.Application.OrdersAdmin
         }
 
          
+        public class OrderViewModel
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+            public string Status { get; set; }
+            public double Total { get; set; }
+            public string OrderDate { get; set; }
+            public string Note { get; set; }
+        }
+
         public class Request
         {            
             public double Total { get; set; }
@@ -102,14 +157,8 @@ namespace WebStore.Application.OrdersAdmin
 
         public class Response
         {
-            public int Id { get; set; }
-            public string Name { get; set; }
-            public string Email { get; set; }
-            public string Phone { get; set; }
-            public string Status { get; set; }
-            public double Total { get; set; }
-            public string OrderDate { get; set; }
-            public string Note { get; set; }
+            public OrderViewModel Order { get; set; }
+            public int Status { get; set; }
         }
     }
 }

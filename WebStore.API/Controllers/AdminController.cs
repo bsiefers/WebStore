@@ -335,13 +335,13 @@ namespace WebStore.UI.Controllers
             try
             {
                 var response = new GetOrder(_context).Do(Id);
-                if (response == null)
+                if (response.Status == 404)
                 {
                     _logger.LogDebug("Order ID Not Found: " + Id);
                     return NotFound();
                 }
                 _logger.LogInformation("GET request for order: " + Id);
-                return Ok(response);
+                return Ok(response.Order);
             }
             catch (Exception e)
             {
@@ -374,9 +374,10 @@ namespace WebStore.UI.Controllers
             }
             try
             {
-                var response = new GetOrderByStatus(_context).Do(status);
-                _logger.LogInformation("GET request for order size: " + response.Order.Count());
-                return Ok(response);
+                var response = new GetOrdersByStatus(_context).Do(status);                
+
+                _logger.LogInformation("GET request for order size: " + response.Orders.Count());
+                return Ok(response.Orders);
             }
             catch (Exception e)
             {
@@ -402,7 +403,7 @@ namespace WebStore.UI.Controllers
             {                
                 var response = new GetOrders(_context).Do();
                 _logger.LogInformation("GET request for orders size: " + response.Orders.Count());
-                return Ok(response);
+                return Ok(response.Orders);
             }
             catch (Exception e)
             {
@@ -450,8 +451,8 @@ namespace WebStore.UI.Controllers
                     _logger.LogDebug("Create order request failed because one of ordered items exceeded the available stock.");
                     return Conflict();
                 }
-                _logger.LogInformation("Order created: " + response.Id);
-                return Ok(response);
+                _logger.LogInformation("Order created: " + response.Order.Id);
+                return Ok(response.Order);
             }
             catch (Exception e)
             {

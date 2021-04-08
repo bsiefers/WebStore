@@ -24,32 +24,38 @@ namespace WebStore.Application.OrdersAdmin
                  .Include(x => x.OrderInventory).Select(x =>
                      new Response
                      {
-                         //Id
-                         Id = x.Id,
-                         StripeRef = x.StripeRef,
-                         //customer info
-                         FirstName = x.FirstName,
-                         LastName = x.LastName,
-                         Email = x.Email,
-                         PhoneNumber = x.PhoneNumber,
-                         Address1 = x.Address1,
-                         Address2 = x.Address2,
-                         City = x.City,
-                         PostCode = x.PostCode,
-                         Status = x.Status,
-                         Total = x.Total,
-                         OrderDate = x.OrderDate.ToString("MM/dd/yy HH:mm:ss"),
-                         Note = x.Note,
-                         State = x.State,
-                         Country = x.Country,
-                         OrderInventory = x.OrderInventory.Select(y => new OrderInventoryViewModel{
-                             InventoryId = y.InventoryId,
-                             ProductName = y.Inventory.Product.Name,
-                             Description = y.Inventory.Description,
-                             Quantity = y.Quantity
-                         })
+                         Status = 200,
+                         Order = new OrderViewModel
+                         {
+                             //Id
+                             Id = x.Id,
+                             StripeRef = x.StripeRef,
+                             //customer info
+                             FirstName = x.FirstName,
+                             LastName = x.LastName,
+                             Email = x.Email,
+                             PhoneNumber = x.PhoneNumber,
+                             Address1 = x.Address1,
+                             Address2 = x.Address2,
+                             City = x.City,
+                             PostCode = x.PostCode,
+                             Status = x.Status,
+                             Total = x.Total,
+                             OrderDate = x.OrderDate.ToString("MM/dd/yy HH:mm:ss"),
+                             Note = x.Note,
+                             State = x.State,
+                             Country = x.Country,
+                             OrderInventory = x.OrderInventory.Select(y => new OrderInventoryViewModel
+                             {
+                                 InventoryId = y.InventoryId,
+                                 ProductName = y.Inventory.Product.Name,
+                                 Description = y.Inventory.Description,
+                                 Quantity = y.Quantity
+                             })
+                         }
                      }).FirstOrDefault();
-                    
+            if (order == null)
+                return new Response { Status = 404 };
             return order;
         }
         public class OrderInventoryViewModel
@@ -59,7 +65,8 @@ namespace WebStore.Application.OrdersAdmin
             public int InventoryId { get; set; }
             public int Quantity { get; set; }
         }
-        public class Response
+
+        public class OrderViewModel
         {
             //Id
             public int Id { get; set; }
@@ -83,6 +90,11 @@ namespace WebStore.Application.OrdersAdmin
             public double Total { get; set; }
             public string OrderDate { get; set; }
             public IEnumerable<OrderInventoryViewModel> OrderInventory { get; set; }
+        }
+        public class Response
+        {
+            public int Status { get; set; }
+            public OrderViewModel Order { get; set; }
         }
     }
 }

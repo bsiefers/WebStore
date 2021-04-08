@@ -15,8 +15,7 @@ namespace WebStore.Tests.UnitTests.Admin.Products
 {
     [TestClass]
     public class CreateProductTest
-    {
-        private Mock<DbSet<Product>> mockProductSet;
+    {        
         private Mock<ApplicationDbContext> mockContext;
         [TestMethod]
         public void TestCreateProduct()

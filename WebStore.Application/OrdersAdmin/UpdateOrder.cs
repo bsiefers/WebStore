@@ -48,7 +48,7 @@ namespace WebStore.Application.OrdersAdmin
                 var quantityDiff = 0;
 
                 var foundItem = _context.OrderInventory
-                    .Where(x => x.OrderId == order.Id && x.InventoryId == item.InventoryId)
+                    .Where(x => x.OrderId == order.Id && x.InventoryId == item.Id)
                     .FirstOrDefault();
                 if (foundItem == null)
                 {
@@ -56,7 +56,7 @@ namespace WebStore.Application.OrdersAdmin
                     newItems.Add(new OrderInventory
                     {
                         OrderId = order.Id,
-                        InventoryId = item.InventoryId,
+                        InventoryId = item.Id,
                         Quantity = item.Quantity
                     });
                 }
@@ -66,9 +66,9 @@ namespace WebStore.Application.OrdersAdmin
                     foundItem.Quantity += quantityDiff;
                     newItems.Add(foundItem);
                 }
-                if (!isInventoryAvailable(item.InventoryId, quantityDiff))
+                if (!isInventoryAvailable(item.Id, quantityDiff))
                     return new Response { Status = 409 };
-                var inventory = _context.Inventory.Where(x => x.Id == item.InventoryId).FirstOrDefault();
+                var inventory = _context.Inventory.Where(x => x.Id == item.Id).FirstOrDefault();
                 inventory.Quantity += quantityDiff;
             }
             order.OrderInventory = newItems;
@@ -84,7 +84,7 @@ namespace WebStore.Application.OrdersAdmin
                     Name = order.FirstName + " " + order.LastName,
                     Email = order.Email,
                     Phone = order.PhoneNumber,
-                    orderDate = order.OrderDate.ToString("MM/dd/yy HH:mm:ss"),
+                    OrderDate = order.OrderDate.ToString("MM/dd/yy HH:mm:ss"),
                     Total = order.Total,
                     Status = order.Status
                 }
@@ -112,13 +112,13 @@ namespace WebStore.Application.OrdersAdmin
             public string Email { get; set; }
             public string Phone { get; set; }            
             public string Note { get; set; }
-            public string orderDate { get; set; }
+            public string OrderDate { get; set; }
             public double Total { get; set; }
             public string Status { get; set; }
         }
-        public class Cart
+        public class CartItem
         {
-            public int InventoryId { get; set; }
+            public int Id { get; set; }
             public int Quantity { get; set; }
         }
 
@@ -130,7 +130,7 @@ namespace WebStore.Application.OrdersAdmin
             public string Note { get; set; }
             public double Total { get; set; }
             public CustomerInformation CustomerInformation { get; set; }
-            public IEnumerable<Cart> Cart { get; set; }
+            public IEnumerable<CartItem> Cart { get; set; }
         }
 
         public class Response
