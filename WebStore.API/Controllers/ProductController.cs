@@ -31,8 +31,8 @@ namespace WebStore.UI.Controllers
             try
             {
                 var response = new GetProducts(_context).Do();
-                _logger.LogInformation("Get request for products retrieved: " + response.Count() + "records.");
-                return Ok(response);
+                _logger.LogInformation("Get request for products retrieved: " + response.Products.Count() + "records.");
+                return Ok(response.Products);
             }
             catch (Exception e)
             {
@@ -57,13 +57,13 @@ namespace WebStore.UI.Controllers
                     return BadRequest();
                 }
                 var response = new GetProduct(_context).Do(name);
-                if (response == null)
+                if (response.Status == 404)
                 {
                     _logger.LogDebug("Get request failed because product with name " + name + " was not found");
                     return NotFound();
                 }
-                _logger.LogInformation("Get request for products retrieved for prduct: " + response.Name);
-                return Ok(response);
+                _logger.LogInformation("Get request for products retrieved for prduct: " + response.Product.Name);
+                return Ok(response.Product);
             }
             catch (Exception e)
             {
@@ -83,13 +83,13 @@ namespace WebStore.UI.Controllers
             try
             {
                 var response = new GetProductByInventoryId(_context).Do(Id);
-                if (response == null)
+                if (response.Status == 404)
                 {
                     _logger.LogDebug("Get request failed because product with ID " + Id + " was not found");
                     return NotFound();
                 }
-                _logger.LogInformation("Get request for products retrieved for prduct: " + response.Name);
-                return Ok(response);
+                _logger.LogInformation("Get request for products retrieved for prduct: " + response.Product.Name);
+                return Ok(response.Product);
             }
             catch (Exception e)
             {

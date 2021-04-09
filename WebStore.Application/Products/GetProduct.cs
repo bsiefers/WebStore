@@ -15,9 +15,9 @@ namespace WebStore.Application.Products
             _context = context;
         }
 
-        public ProductViewModel Do(string name)
+        public Response Do(string name)
         {
-           return _context.Products
+           var pvm = _context.Products
                 .Where(x => x.Name == name)
                 .Include(x => x.Inventory)
                 .Select(pvm => new ProductViewModel
@@ -38,6 +38,15 @@ namespace WebStore.Application.Products
                    Stock = y.Quantity
                })
            }).FirstOrDefault();
+
+            if(pvm == null)
+            {
+                return new Response { Status = 404 };
+            }
+            else
+            {
+                return new Response { Product = pvm, Status = 200 };
+            }
         }
         public class ProductViewModel
         {
@@ -54,6 +63,11 @@ namespace WebStore.Application.Products
             public string Price { get; set; }
             public string Description { get; set; }
             public int Stock { get; set; }
+        }
+        public class Response
+        {
+            public int Status { get; set; }
+            public ProductViewModel Product { get; set; }
         }
     }
 }

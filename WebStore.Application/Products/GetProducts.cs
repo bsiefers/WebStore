@@ -15,9 +15,11 @@ namespace WebStore.Application.Products
             _context = context;
         }
 
-        public IEnumerable<ProductViewModel> Do()
+        public Response Do()
         {
-           return _context.Products.Include(x => x.Inventory).ToList().Where(x => x.Inventory != null && x.Inventory.Count > 0).Select(pvm => new ProductViewModel
+           var pvm = _context.Products.Include(x => x.Inventory).ToList()
+                .Where(x => x.Inventory != null && x.Inventory.Count > 0)
+                .Select(pvm => new ProductViewModel
            {
                Name = pvm.Name,
                Description = pvm.Description,
@@ -25,12 +27,22 @@ namespace WebStore.Application.Products
                                 "data:image/png;base64," + pvm.ProductImage :
                                 null
            });
+            return new Response
+            {
+                Products = pvm,
+                Status = 200
+            };
         }
         public class ProductViewModel
         {
             public string Name { get; set; }
             public string Description { get; set; }            
             public string ProductImage { get; set; }
+        }
+        public class Response
+        {
+            public IEnumerable<ProductViewModel> Products { get; set; }
+            public int Status { get; set; }
         }
     }
 }

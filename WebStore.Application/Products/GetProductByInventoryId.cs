@@ -15,24 +15,45 @@ namespace WebStore.Application.Products
             _context = context;
         }
 
-        public ProductViewModel Do(int Id)
+        public Response Do(int Id)
         {
-            return _context.Inventory
+            var product = _context.Inventory
                 .Where(x => x.Id == Id)
-                .Include(x => x.Product)
-                .Select(pvm => new ProductViewModel
+                .Include(x => x.Product).FirstOrDefault();
+            ProductViewModel pvm = null;
+            if(product != null)
+            {
+                 pvm = new ProductViewModel
                 {
-                    Name = pvm.Product.Name,
-                    Description = pvm.Product.Description,
-                    ProductImage = Convert.FromBase64String(pvm.InventoryImage)
-                }).FirstOrDefault();            
+                    Name = product.Product.Name,
+                    Description = product.Product.Description,
+                    ProductImage = product.Product.ProductImage != null ?
+                                    "data:image/png;base64," + 
+                                    product.Product.ProductImage :
+                                    null
+                };
+            }
+
+            if (pvm == null)
+            {
+                return new Response { Status = 404 };
+            }
+            else
+            {
+                return new Response { Product = pvm, Status = 200 };
+            }
         }
 
         public class ProductViewModel
         {
             public string Name { get; set; }
-            public byte[] ProductImage { get; set; }
+            public string ProductImage { get; set; }
             public string Description { get; set; }            
+        }
+        public class Response
+        {
+            public int Status { get; set; }
+            public ProductViewModel Product { get; set; }
         }
     }
 }

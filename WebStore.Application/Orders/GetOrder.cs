@@ -76,9 +76,5 @@ namespace WebStore.Application.Orders
             public string InventoryDescription { get; set; }
         }
 
-        public class Request
-        {
-
-        }
     }
 }
