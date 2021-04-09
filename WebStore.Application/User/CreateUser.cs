@@ -26,23 +26,17 @@ namespace WebStore.Application.CreateUser
         }
         async public Task<Response> Do(Request request)
         {
-            User user = _context.Users.Where(x => x.Email == request.Email).Select(x => new User
-            {
-                Id = x.Id,
-                Email = x.Email,
-                PasswordHash = x.PasswordHash,
-                UserRole = x.UserRole,
-                Salt = x.Salt
-            }).FirstOrDefault();
+            User user = _context.Users.Where(x => x.Email == request.Email.ToLower()).FirstOrDefault();
 
             if(user != null)
             {
-                return new Response();
+                return new Response {Status = 409 };
             }
             else
             {
-                return new Response{ 
-                   Token = GenerateJWT(await AddUser(request.Email, request.Password)) 
+                return new Response {
+                   Status = 201,
+                   Token = GenerateJWT(await AddUser(request.Email.ToLower(), request.Password)) 
                 };
             }
         }
@@ -99,6 +93,7 @@ namespace WebStore.Application.CreateUser
 
         public class Response
         {
+            public int Status { get; set; }
             public string Token { get; set; }
         }
         public class Request

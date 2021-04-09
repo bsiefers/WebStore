@@ -15,13 +15,12 @@ namespace WebStore.Tests.UnitTests.Admin.Products
 {
     [TestClass]
     public class CreateProductTest
-    {        
-        private Mock<ApplicationDbContext> mockContext;
+    {                
         [TestMethod]
         public void TestCreateProduct()
         {
             Random random = new Random();
-            mockContext = new Mock<ApplicationDbContext>();
+            Mock<ApplicationDbContext> mockContext = new Mock<ApplicationDbContext>();
 
             string name = StringUtilities.CreateRandomString(0, 300);
             string description = StringUtilities.CreateRandomString(0, 5000);

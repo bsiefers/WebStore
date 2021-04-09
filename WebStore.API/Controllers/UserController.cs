@@ -41,13 +41,21 @@ namespace WebStore.API.Controllers
                     return BadRequest();
                 }
                 var response = new LoginUser(_jwtConfig, _context).Do(request);
-                if (response.Token == null)
+                if (response.Status == 401)
                 {
                     _logger.LogDebug("Login request failed because email password combination didn\'t match.");
                     return Unauthorized();
+                }else if(response.Status == 400)
+                {
+                    _logger.LogDebug("Login request failed because password didn\'t pass validation");
+                    return BadRequest();
+                }
+                else
+                {
+                    _logger.LogInformation("Succesful login.");
+                    return Ok(response.Token);
                 }
 
-                return Ok(response);
             }
             catch (Exception e)
             {
@@ -74,13 +82,20 @@ namespace WebStore.API.Controllers
                     return BadRequest();
                 }
                 var response = await new CreateUser(_jwtConfig, _context).Do(request);
-                if (response.Token == null)
+                if (response.Status == 409)
                 {
                     _logger.LogDebug("Signup request failed because there already exists an email with the record.");
                     return Conflict();
+                }else if (response.Status == 400)
+                {
+                    _logger.LogDebug("Login request failed because password didn\'t pass validation");
+                    return BadRequest();
                 }
-
-                return Ok(response);
+                else
+                {
+                    _logger.LogInformation("Succesful user creation.");
+                    return Ok(response.Token);
+                }
             }
             catch (Exception e)
             {

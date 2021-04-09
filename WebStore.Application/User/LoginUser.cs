@@ -27,13 +27,13 @@ namespace WebStore.Application.LoginUser
         public Response Do(Request request)
         {
 
-            var user = AuthenticateUser(request.Email, request.Password);
+            var user = AuthenticateUser(request.Email.ToLower(), request.Password);
             if(user != null)
             {
                 var tokenStr = GenerateJWT(user);
-                return new Response { Token = tokenStr};
+                return new Response { Status = 200, Token = tokenStr};
             }
-            return new Response();
+            return new Response {Status = 401 };
         }
 
         private User AuthenticateUser(string email, string password)
@@ -56,7 +56,7 @@ namespace WebStore.Application.LoginUser
               iterationCount: 10000,
               numBytesRequested: 256 / 8));
 
-            if (email == user.Email && hashedPassword == user.PasswordHash)
+            if (email.ToLower() == user.Email && hashedPassword == user.PasswordHash)
             {
                 return user;
             }
@@ -89,6 +89,7 @@ namespace WebStore.Application.LoginUser
 
         public class Response
         {
+            public int Status { get; set; }
             public string Token { get; set; }
         }
         public class Request
