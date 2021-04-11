@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using WebStore.Application.Orders;
+using WebStore.Application.Services.Payment;
 using WebStore.Database;
 
 namespace WebStore.UI.Controllers
@@ -24,7 +25,7 @@ namespace WebStore.UI.Controllers
          * creates a payment and its respective order
          */
         [HttpPost("orders/payment")]
-        public IActionResult CreatePayment([FromBody] CreatePayment.Request request)
+        public IActionResult CreateOrder([FromBody] CreateOrder.Request request)
         {
             try
             {
@@ -44,7 +45,7 @@ namespace WebStore.UI.Controllers
                 }
                 
 
-                var response = new CreatePayment(_context).Do(request);
+                var response = new CreateOrder(_context, new PaymentService()).Do(request);
                 if (response == null)
                 {
                     _logger.LogDebug("Create payment request failed when trying to create payment with Stripe.");
@@ -61,30 +62,5 @@ namespace WebStore.UI.Controllers
             }
         }
 
-        /* GET
-         * [/api/orders/{int}]
-         * gets the reference for an order
-         */
-        [HttpGet("orders/{int}")]
-        public IActionResult GetOrder(int Id)
-        {
-            try
-            {
-                var response = new GetOrder(_context).Do(Id);
-                if (response == null)
-                {
-                    _logger.LogDebug("Order with ID " + Id + " was not found.");
-                    return NotFound();
-                }
-                _logger.LogDebug("Order get request for: " + Id);
-                return Ok(response);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message);
-                _logger.LogError(e.StackTrace);
-                return StatusCode(500);
-            }
-        }
     }
 }
